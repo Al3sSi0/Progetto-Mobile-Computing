@@ -4,7 +4,7 @@ import 'package:flutter/services.dart';
 
 const colore_barra = Color(0xFF06402B);
 const colore_sfondo1 = Color(0xFFEDE8D0);
-const colore_sfondo2 = Color(0xFFC9C5B1);
+const colore_sfondo2 = Color(0xFFB8B5A4);
 
 class Structure extends StatefulWidget {
   const Structure({super.key});

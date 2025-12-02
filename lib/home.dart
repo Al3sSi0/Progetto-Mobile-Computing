@@ -5,11 +5,127 @@ import 'package:corner/pages/acqua_page.dart';
 import 'package:flutter/material.dart';
 import 'dart:math';
 
-
-class _ButtonSpec {
+class CardButtonData {
   final String title;
   final IconData icon;
-  const _ButtonSpec(this.title, this.icon);
+  final Widget Function() pageBuilder;
+  const CardButtonData(this.title, this.icon, this.pageBuilder);
+}
+
+class AnimatedButtonsCarousel extends StatefulWidget {
+  const AnimatedButtonsCarousel({super.key});
+
+  @override
+  State<AnimatedButtonsCarousel> createState() => _AnimatedButtonsCarouselState();
+}
+
+class _AnimatedButtonsCarouselState extends State<AnimatedButtonsCarousel> {
+  late PageController _pageController;
+  final double _viewportFraction = 0.8;
+  final double _scaleFactor = 0.8;
+
+  final List<CardButtonData> _items = [
+    CardButtonData('Sole', Icons.wb_sunny, () => SolePage()),
+    CardButtonData('Fuoco', Icons.local_fire_department, () => FuocoPage()),
+    CardButtonData('Acqua', Icons.water_drop, () => AcquaPage()),
+  ];
+
+  @override
+  void initState() {
+    super.initState();
+    _pageController = PageController(
+      viewportFraction: _viewportFraction,
+      initialPage: _items.length * 100,
+    );
+    _pageController.addListener(() {
+      setState(() {});
+    });
+  }
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: 400,
+      child: PageView.builder(
+        controller: _pageController,
+        itemBuilder: (context, index) {
+          return _buildCarouselItem(index);
+        },
+      ),
+    );
+  }
+
+  Widget _buildCarouselItem(int index) {
+    final int realIndex = index % _items.length;
+    final CardButtonData data = _items[realIndex];
+
+    Matrix4 matrix = Matrix4.identity();
+
+    double currPageValue = 0.0;
+    if (_pageController.hasClients && _pageController.page != null) {
+      currPageValue = _pageController.page!;
+    }
+
+    double delta = (index - currPageValue);
+    double scale = (1 - (delta.abs() * (1 - _scaleFactor))).clamp(_scaleFactor, 1.0);
+    double transY = (400 * (1 - scale)) / 2;
+
+    matrix = Matrix4.diagonal3Values(1.0, scale, 1.0)..setTranslationRaw(0, transY, 0);
+
+    return Transform(
+      transform: matrix,
+      child: Card(
+        elevation: 8,
+        margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 20),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        color: colore_barra,
+        clipBehavior: Clip.hardEdge,
+        child: InkWell(
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => data.pageBuilder()),
+            );
+          },
+          child: Container(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(20),
+              gradient: LinearGradient(
+                colors: [
+                  colore_barra.withOpacity(0.7),
+                  colore_barra,
+                ],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+            ),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(data.icon, size: 80, color: Colors.white),
+                const SizedBox(height: 10),
+                Text(
+                  data.title,
+                  style: const TextStyle(
+                    fontSize: 30,
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                    shadows: [Shadow(color: Colors.black26, blurRadius: 5)],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
 }
 
 
@@ -69,81 +185,10 @@ class _HomeState extends State<Home> {
               ),
             
               Positioned(
-                bottom: 0.06*screenHeight,
-                left: 0.06*screenWidth,
-                right: 0.06*screenWidth,
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: ElevatedButton.icon(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: colore_barra,
-                          padding: const EdgeInsets.symmetric(vertical: 16),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                        ),
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(builder: (_) => const SolePage()),
-                          );
-                        },
-                        icon: const Icon(Icons.wb_sunny, color: Colors.white),
-                        label: const Text(
-                          'Sole',
-                          style: TextStyle(fontSize: 18, color: Colors.white),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: ElevatedButton.icon(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: colore_barra,
-                          padding: const EdgeInsets.symmetric(vertical: 16),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                        ),
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(builder: (_) => const FuocoPage()),
-                          );
-                        },
-                        icon: const Icon(Icons.local_fire_department, color: Colors.white),
-                        label: const Text(
-                          'Fuoco',
-                          style: TextStyle(fontSize: 18, color: Colors.white),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: ElevatedButton.icon(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: colore_barra,
-                          padding: const EdgeInsets.symmetric(vertical: 16),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                        ),
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(builder: (_) => const AcquaPage()),
-                          );
-                        },
-                        icon: const Icon(Icons.water_drop, color: Colors.white),
-                        label: const Text(
-                          'Acqua',
-                          style: TextStyle(fontSize: 18, color: Colors.white),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
+                top: 0.43*screenHeight,
+                left: 0,
+                right: 0,
+                child: const AnimatedButtonsCarousel(),
               )          
             ],
           ),
