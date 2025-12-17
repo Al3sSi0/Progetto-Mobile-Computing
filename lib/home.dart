@@ -1,3 +1,4 @@
+import 'package:corner/services/auth.dart';
 import 'package:corner/structure.dart';
 import 'package:corner/pages/sole_page.dart';
 import 'package:corner/pages/fuoco_page.dart';
@@ -140,7 +141,12 @@ class Home extends StatefulWidget {
   State<Home> createState() => _HomeState();
 }
 
+
 class _HomeState extends State<Home> {
+  Future<void> signOut() async{
+    await AuthService().signOut();
+  }
+
   @override
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
@@ -257,6 +263,9 @@ class _HomeState extends State<Home> {
                 left: 0,
                 right: 0,
                 child: const AnimatedButtonsCarousel(),
+              ),
+              Positioned(top: 0.5*screenHeight,
+              child: TextButton(onPressed: (){signOut();}, child: Text('OUT')),
               )          
             ],
           ),
