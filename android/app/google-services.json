@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "770407907852",
+    "project_id": "corner-c4026",
+    "storage_bucket": "corner-c4026.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:770407907852:android:39cdabdfe309545c0ea429",
+        "android_client_info": {
+          "package_name": "com.example.corner"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA7v7dEkBDObaEIKuE-O-o4fzaugYq4WQc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
