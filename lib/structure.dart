@@ -1,6 +1,10 @@
 import 'package:corner/home.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart'; 
+import 'package:flutter/services.dart';
+import 'package:google_nav_bar/google_nav_bar.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:corner/profile.dart';
+import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 
 const colore_barra = Color(0xFF06402B);
 const colore_sfondo1 = Color(0xFFEDE8D0);
@@ -14,13 +18,9 @@ class Structure extends StatefulWidget {
 }
 
 class _StructureState extends State<Structure> {
-
-
   int _currentIndex = 0;
-  
   late PageController _pageController;
 
-  
   @override
   void initState() {
     super.initState();
@@ -45,65 +45,47 @@ class _StructureState extends State<Structure> {
     );
   }
 
-
   void _onPageChanged(int index) {
     setState(() {
       _currentIndex = index;
     });
   }
 
-
- 
   @override
   Widget build(BuildContext context) {
     return AnnotatedRegion<SystemUiOverlayStyle>(
-    value: const SystemUiOverlayStyle(
-      systemNavigationBarColor: colore_barra),
-      child: 
-      Scaffold(
-      body:
-        PageView(
-        controller: _pageController,
-        onPageChanged: _onPageChanged,
-        children:  [
-          Home(),
-       
-          Container(decoration: BoxDecoration(color: Colors.blue)),
-       
-          Container(decoration: BoxDecoration(color: Colors.green),),
-       
-          Container(decoration: BoxDecoration(color: Colors.yellow),),
-        ],
+      value: const SystemUiOverlayStyle(systemNavigationBarColor: colore_barra),
+      child: Scaffold(
+        extendBody: true,
+        body: PageView(
+          controller: _pageController,
+          onPageChanged: _onPageChanged,
+          children: [
+            Home(),
+
+            Container(decoration: BoxDecoration(color: Colors.blue)),
+
+            Container(decoration: BoxDecoration(color: Colors.green)),
+
+            Profile(),
+          ],
+        ),
+
+        bottomNavigationBar: CurvedNavigationBar(
+          index: _currentIndex,
+          backgroundColor: Colors.transparent, // Lo sfondo dietro la curva
+          color: colore_barra, // Il colore della barra stessa
+          buttonBackgroundColor: colore_barra, // Il colore del cerchio che sale
+          height: 60,
+          items: <Widget>[
+            Icon(CupertinoIcons.home, size: 30, color: Colors.white),
+            Icon(CupertinoIcons.shopping_cart, size: 30, color: Colors.white),
+            Icon(CupertinoIcons.star, size: 30, color: Colors.white),
+            Icon(CupertinoIcons.person, size: 30, color: Colors.white),
+          ],
+          onTap: _onBottomNavTapped,
+        ),
       ),
-      
-       bottomNavigationBar: BottomNavigationBar(
-        backgroundColor: colore_barra,
-        currentIndex: _currentIndex,
-        onTap: _onBottomNavTapped,
-        type: BottomNavigationBarType.fixed,
-        selectedItemColor: Colors.white,
-        unselectedItemColor: const Color.fromARGB(255, 206, 206, 206),
-        showUnselectedLabels: true,
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Home'
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.search),
-            label: 'Cerca',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.notifications),
-            label: 'Notifiche',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person),
-            label: 'Profilo',
-          ),
-        ],
-      ),
-    ),
     );
   }
 }
