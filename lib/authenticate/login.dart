@@ -19,9 +19,59 @@ class _LoginPageState extends State<LoginPage> {
 
   Future<void> signIn() async{
     try{
-      await AuthService().signEmailPass(email: _email.text, password: _password.text);
-    }on FirebaseAuthException catch(e){}
+      await AuthService().signEmailPass(email: _email.text.trim(), password: _password.text);
+      if (mounted) {
+      Navigator.of(context).pop(); 
+    }
+    }on FirebaseAuthException catch(e){
+      if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Errore: ${e.toString()}", style: TextStyle(
+          color: Colors.black,
+          fontSize: 15,
+        ),textAlign: TextAlign.center,), 
+        backgroundColor: Colors.red,
+        behavior: SnackBarBehavior.floating,
+        duration: const Duration(seconds: 4),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),),
+      );
+    }
+    }
   }
+
+  Future<void> _resetPassword() async {
+  try {
+    await AuthService().resetPassword(email: _email.text.trim());
+
+    if (mounted) {
+      print("Tentativo di reset per: ${_email.text.trim()}");
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: const Text("Email di ripristino inviata! Controlla la tua posta.", 
+          style: TextStyle(fontSize: 15),
+          ),
+          backgroundColor: Colors.green,
+          behavior: SnackBarBehavior.floating,
+          duration: const Duration(seconds: 4),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+        ),
+      );
+    }
+  } catch (e) {
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Errore: ${e.toString()}", style: TextStyle(
+          color: Colors.black,
+          fontSize: 15,
+        ),textAlign: TextAlign.center,), 
+        backgroundColor: Colors.red,
+        behavior: SnackBarBehavior.floating,
+        duration: const Duration(seconds: 4),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),),
+      );
+    }
+  }
+}
 
 
   @override
@@ -59,26 +109,67 @@ class _LoginPageState extends State<LoginPage> {
                   color: colore_barra,
                   iconSize: 40,
                   onPressed: () {
-                     Navigator.push(
-                            context,
-                            MaterialPageRoute(builder: (_) => Authentication()),
-                          );
+                    Navigator.pop(context);                 
                   },
                 )),
-              Positioned(
-                top: 0.1*screenHeight,
-                left: 0.2*screenWidth,
+                
+             Positioned(
+                top: 0.08 * screenHeight,
                 right: 0,
-                child: Image.asset('assets/images/login_image.png',
-                height: 0.45*screenHeight,
-                )),
+                child: ShaderMask(
+                  shaderCallback: (rect) {
+                    return const LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      colors: [Colors.black, Colors.transparent],
+                    ).createShader(rect);
+                  },
+                  blendMode: BlendMode.dstIn,
+                  child: Opacity(
+                    opacity: 1, 
+                    child: Image.asset(
+                      'assets/images/vardy_corner.png',
+                      height: 0.5 * screenHeight,
+                      width: 0.6 * screenWidth,
+                      alignment: Alignment.centerRight,
+                    ),
+                  ),
+                ),
+              ),
+           Positioned(
+                top: 0.15 * screenHeight,
+                left: 0.05*screenWidth,
+                child: ShaderMask(
+                  shaderCallback: (rect) {
+                    return const LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      colors: [Colors.black, Colors.transparent], 
+                    ).createShader(rect);
+                  },
+                  blendMode: BlendMode.dstIn,
+                  child: Opacity(
+                    opacity: 1,
+                    child: Image.asset(
+                      'assets/images/lewa_corner.png',
+                      height: 0.35 * screenHeight,
+                      width: 0.4* screenWidth,
+                      alignment: Alignment.centerRight,
+                    ),
+                  ),
+                ),
+              ),
               Positioned(top: 0.45*screenHeight,
                 left: 0.1*screenWidth,
                 right: 0.1*screenWidth,
                 child: Card(
+                  color: const Color.fromARGB(255, 255, 249, 249),
                   elevation: 5, 
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(15), 
+                    side: BorderSide(
+                      color: Color(0xFFE0E0E0),
+                    )
                   ),
                   child: Padding(
                     padding: const EdgeInsets.all(10),
@@ -100,9 +191,13 @@ class _LoginPageState extends State<LoginPage> {
                 left: 0.1*screenWidth,
                 right: 0.1*screenWidth,
                 child: Card(
+                  color: const Color.fromARGB(255, 255, 249, 249),
                   elevation: 5, 
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(15), 
+                    side: BorderSide(
+                      color: Color(0xFFE0E0E0),
+                    )
                   ),
                   child: Padding(
                     padding: const EdgeInsets.all(10),
@@ -131,6 +226,10 @@ class _LoginPageState extends State<LoginPage> {
                     shadowColor: Colors.black,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
+                      side: const BorderSide(
+                          color: Colors.white, 
+                          width: 1.5,            
+                        ),
                     ),
                     padding: const EdgeInsets.all(20)
                   ),
@@ -143,13 +242,46 @@ class _LoginPageState extends State<LoginPage> {
                     fontFamily: 'Instagram Sans',
                     fontWeight: FontWeight.bold,
                     color: Colors.white,
-                    letterSpacing: 2,
+                    letterSpacing: 5,
                     fontSize: 17
                     ),
                   ),
-                ))
+                )),
+                Positioned(
+              top: 0.78 * screenHeight, 
+              left: 0,
+              right: 0,
+              child: GestureDetector(
+                onTap: () {
+                  if (_email.text.isNotEmpty) {
+                    _resetPassword();
+                  } else {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text("Inserisci prima l'email per resettare la password", style: TextStyle(
+                        color: Colors.black,
+                        fontSize: 15,
+                      ),textAlign: TextAlign.center,), 
+                      backgroundColor: Colors.red,
+                      behavior: SnackBarBehavior.floating,
+                      duration: const Duration(seconds: 4),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),),
+                    );
+                  }
+                },
+                child: const Text(
+                  "Password dimenticata?",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: Colors.blue,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 15
+                  ),
+                ),
+              ),
+            ),
             ],
-          ))
+          )
+          )
       ),
     ),
     );

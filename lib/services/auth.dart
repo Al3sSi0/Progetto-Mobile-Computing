@@ -12,8 +12,16 @@ class AuthService {
     await _auth.signInWithEmailAndPassword(email: email, password: password);
   }
 
-  Future<void> createEmailPass({required String email, required String password}) async{
-    await _auth.createUserWithEmailAndPassword(email: email, password: password);
+ 
+  Future<void> createEmailPass({required String email, required String password}) async {
+    try {
+      UserCredential result = await _auth.createUserWithEmailAndPassword(
+          email: email, password: password);
+
+      await result.user?.sendEmailVerification();
+    } catch (e) {
+      rethrow;
+    }
   }
 
   Future signOut() async{
@@ -40,6 +48,14 @@ Future<UserCredential?> signInWithGoogle() async {
   } catch (e) {
     print("Errore durante il login Google: $e");
     return null;
+  }
+}
+
+Future<void> resetPassword({required String email}) async {
+  try {
+    await _auth.sendPasswordResetEmail(email: email);
+  } on FirebaseAuthException catch (e) {
+    rethrow; 
   }
 }
 

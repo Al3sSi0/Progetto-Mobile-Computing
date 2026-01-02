@@ -1,4 +1,6 @@
 
+import 'package:corner/authenticate/signup.dart';
+
 import 'login.dart'; 
 import 'package:corner/structure.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -86,13 +88,13 @@ class _AuthenticationState extends State<Authentication> {
                               ),
                    ),),
               Positioned(
-                top: 0.1*screenHeight,
-                left: 0.1*screenWidth,
+                top: 0.05*screenHeight,
+                left: 0*screenWidth,
                 right: 0,
-                child: Image.asset('assets/images/welcome_image.png',
-                height: 0.40*screenHeight,)),
+                child: Image.asset('assets/images/logo_corner.png',
+                height: 0.5*screenHeight,)),
               Positioned(
-                top: 0.45 * screenHeight,
+                top: 0.47 * screenHeight,
                 left: 0.1 * screenWidth,
                 right: 0.1 * screenWidth,
                 child: Card(
@@ -135,7 +137,7 @@ class _AuthenticationState extends State<Authentication> {
               
 
              Positioned(
-                top: 0.55 * screenHeight,
+                top: 0.57 * screenHeight,
                 left: 0.1 * screenWidth,
                 right: 0.1 * screenWidth,
                 child: Card(
@@ -148,7 +150,7 @@ class _AuthenticationState extends State<Authentication> {
                     onTap: () {
                       Navigator.push(
                             context,
-                            MaterialPageRoute(builder: (_) => LoginPage()),
+                            MaterialPageRoute(builder: (_) => Signup()),
                           );
                     },
                     child:  Padding(
