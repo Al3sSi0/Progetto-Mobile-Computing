@@ -21,6 +21,7 @@ dev_dependencies:
     sdk: flutter
   flutter_lints: ^5.0.0
   flutter_native_splash: ^2.3.1
+  icons_launcher: ^3.0.3
 
 flutter:
   uses-material-design: true
@@ -48,3 +49,13 @@ flutter_native_splash:
   android_12:
     image: assets/images/splashScreen_corner.png
     color: "#B8B5A4"
+
+icons_launcher:
+  image_path: 'assets/icon/icon_removebg.png'
+  platforms:
+    android:
+      enable: true
+      adaptive_background_color: '#B8B5A4'
+      adaptive_foreground_image: 'assets/icon/icon_removebg.png'
+    ios:
+      enable: true
