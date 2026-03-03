@@ -145,10 +145,6 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> with AutomaticKeepAliveClientMixin {
-  Future<void> signOut() async {
-    await AuthService().signOut();
-  }
-
   @override
   bool get wantKeepAlive => true;
 
@@ -302,15 +298,6 @@ class _HomeState extends State<Home> with AutomaticKeepAliveClientMixin {
                   height:
                       400, // <--- CAMBIA QUESTO VALORE in base all'altezza che vuoi per le card
                   child: const AnimatedButtonsCarousel(),
-                ),
-              ),
-              Positioned(
-                top: 0.5 * screenHeight,
-                child: TextButton(
-                  onPressed: () {
-                    signOut();
-                  },
-                  child: Text('OUT'),
                 ),
               ),
             ],

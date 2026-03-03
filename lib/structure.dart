@@ -67,7 +67,7 @@ class _StructureState extends State<Structure> {
 
             Container(decoration: BoxDecoration(color: Colors.green)),
 
-            Profile(),
+            ProfilePage(),
           ],
         ),
 

@@ -10,11 +10,17 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  cupertino_icons: ^1.0.8
-  firebase_core: ^4.3.0
+  audioplayers: ^6.0.0
+  firebase_storage: ^13.0.6
+  cupertino_icons: ^1.0.6
+  firebase_core: ^4.4.0
   firebase_auth: ^6.1.3
   google_nav_bar: ^5.0.7
   curved_navigation_bar: ^1.0.6
+  image_picker: ^1.2.1       # Per accedere a galleria/camera
+  cloud_firestore: ^6.1.2    # Per salvare l'URL nel profilo utente
+  cached_network_image: ^3.3.0 # Ottimo per mostrare immagini dal web con cache
+  #flutter_local_notifications: ^20.1.0
 
 dev_dependencies:
   flutter_test:
@@ -29,7 +35,7 @@ flutter:
   # Asset delle immagini
   assets:
     - assets/images/
-
+    - assets/audio/
   # Configurazione dei Font
   fonts:
     - family: Instagram Sans
