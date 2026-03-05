@@ -36,14 +36,19 @@ class _MyAppState extends State<MyApp> {
       debugShowCheckedModeBanner: false,
       home: StreamBuilder(
         stream: AuthService().authStateChanges, 
-        builder: (context, snapshot){
-          if(snapshot.hasData){
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Scaffold(
+              body: Center(child: CircularProgressIndicator()),
+            );
+          }
+
+          if (snapshot.hasData && snapshot.data != null) {
             return Structure();
           }
-          else{
-            return Authentication();
-          }
+          return Authentication();
         }
-      ));
+      ),
+    );
   }
 }
