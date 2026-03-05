@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "770407907852",
+    "firebase_url": "https://corner-c4026-default-rtdb.firebaseio.com",
+    "project_id": "corner-c4026",
+    "storage_bucket": "corner-c4026.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:770407907852:android:39cdabdfe309545c0ea429",
+        "android_client_info": {
+          "package_name": "com.example.corner"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "770407907852-ft14k366meog795s7qdqegm61nnh644i.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.corner",
+            "certificate_hash": "3f113abb3ab7295c1b5b9e1f3fcdda9b468e24ed"
+          }
+        },
+        {
+          "client_id": "770407907852-cp8hmgj9njiv9h3fo698of39749jhimp.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA7v7dEkBDObaEIKuE-O-o4fzaugYq4WQc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "770407907852-cp8hmgj9njiv9h3fo698of39749jhimp.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "770407907852-ro6muhlvl6js57fijcqq048jlp5n8v3u.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.corner"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
