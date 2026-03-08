@@ -1,21 +1,26 @@
+import 'package:corner/pages/ilMilionario_screen.dart';
 import 'package:corner/services/auth.dart';
 import 'package:corner/structure.dart';
 import 'package:corner/pages/sole_page.dart';
 import 'package:corner/pages/fuoco_page.dart';
-import 'package:corner/pages/acqua_page.dart';
+import 'package:corner/pages/ilMilionario_screen.dart';
 import 'package:flutter/material.dart';
 import 'dart:math';
 import 'dart:ui';
 
 class CardButtonData {
   final String title;
-  final IconData icon;
   final Widget Function() pageBuilder;
-  const CardButtonData(this.title, this.icon, this.pageBuilder);
+  final String imagePath;
+  final double topImg;
+  final double widthImg;
+  final double heightImg;
+  const CardButtonData(this.title, this.pageBuilder, this.imagePath, this.topImg, this.widthImg, this.heightImg);
 }
 
 class AnimatedButtonsCarousel extends StatefulWidget {
   const AnimatedButtonsCarousel({super.key});
+  
 
   @override
   State<AnimatedButtonsCarousel> createState() =>
@@ -28,9 +33,9 @@ class _AnimatedButtonsCarouselState extends State<AnimatedButtonsCarousel> {
   final double _scaleFactor = 0.8;
 
   final List<CardButtonData> _items = [
-    CardButtonData('Sole', Icons.wb_sunny, () => SolePage()),
-    CardButtonData('Fuoco', Icons.local_fire_department, () => FuocoPage()),
-    CardButtonData('Acqua', Icons.water_drop, () => AcquaPage()),
+    CardButtonData('Sole', () => SolePage(),'assets/images/messi_corner.png',10, 500, 500),
+    CardButtonData('Fuoco', () => FuocoPage(),'assets/images/messi_corner.png',10, 500, 500),
+    CardButtonData('IL MILIONARIO', () => QuizScreen(),'assets/images/modric_corner.png',30,500,400),
   ];
 
   @override
@@ -91,49 +96,93 @@ class _AnimatedButtonsCarouselState extends State<AnimatedButtonsCarousel> {
       ..setTranslationRaw(0, transY, 0);
 
     return Transform(
-      transform: matrix,
-      child: Card(
-        elevation: 8,
-        margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 20),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        color: colore_barra,
-        clipBehavior: Clip.hardEdge,
-        child: InkWell(
-          onTap: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (_) => data.pageBuilder()),
-            );
-          },
-          child: Container(
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(20),
-              gradient: LinearGradient(
-                colors: [colore_barra.withOpacity(0.7), colore_barra],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
-            ),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(data.icon, size: 80, color: Colors.white),
-                const SizedBox(height: 10),
-                Text(
-                  data.title,
-                  style: const TextStyle(
-                    fontSize: 30,
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                    shadows: [Shadow(color: Colors.black26, blurRadius: 5)],
+    transform: matrix,
+    child: Card(
+      elevation: 10,
+      margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 20),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+      clipBehavior: Clip.hardEdge,
+      child: InkWell(
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (_) => data.pageBuilder()),
+          );
+        },
+       child: Container(
+  decoration: BoxDecoration(
+    borderRadius: BorderRadius.circular(20),
+    gradient: LinearGradient(
+      begin: Alignment.topCenter, // Punto di inizio (es. in alto a sinistra)
+      end: Alignment.bottomCenter, // Punto di fine (es. in basso a destra)
+      colors: [
+
+        colore_barra.withOpacity(0.5), // Stesso colore ma più trasparente
+         colore_barra, // Colore pieno
+      ],
+      stops: const [0, 0.7], // 0.0 è l'inizio, 1.0 è la fine
+    ),
+  ),
+          child: Stack(
+            children: [
+
+             
+          Positioned(
+            top: data.topImg,
+            bottom: 0,
+            left: 0,
+            right: 0,
+                child: ShaderMask(
+                  shaderCallback: (rect) {
+                    return const LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      colors: [Colors.black, Colors.transparent],
+                      stops: [0.3, 0.9], 
+                    ).createShader(rect);
+                  },
+                  blendMode: BlendMode.dstIn,
+                  child: Opacity(
+                    opacity: 0.3, 
+                    child: Image.asset(
+                      data.imagePath,
+                      width: data.widthImg,
+                      height: data.heightImg, 
+                      fit: BoxFit.cover, 
+                    ),
                   ),
                 ),
-              ],
-            ),
+              ),
+                        Center(
+                child: Padding(
+                  padding: const EdgeInsets.all(15.0),
+                  child: Stack(
+                   
+                    children: [
+                      Positioned(
+                        top: 0.20*MediaQuery.of(context).size.height,
+                        right: 0,
+                        left: 0,
+                        child: Text(
+                        data.title,
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(
+                          fontSize: 35,
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                          shadows: [Shadow(color: Colors.black45, blurRadius: 10)],
+                        ),
+                      ),)
+                      
+                    ],
+                  ),
+                ),
+              ),
+            ],
           ),
         ),
       ),
-    );
+    ),);
   }
 }
 
