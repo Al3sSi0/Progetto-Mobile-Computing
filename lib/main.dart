@@ -65,7 +65,7 @@ class _MyAppState extends State<MyApp> {
             );
           }
 
-          if (snapshot.hasData && snapshot.data != null) {
+          if (snapshot.hasData && snapshot.data != null  && snapshot.data!.emailVerified) {
             return Structure();
           }
           return Authentication();

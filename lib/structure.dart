@@ -1,4 +1,5 @@
 import 'package:corner/home.dart';
+import 'package:corner/achivments.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
@@ -61,11 +62,12 @@ class _StructureState extends State<Structure> {
           controller: _pageController,
           onPageChanged: _onPageChanged,
           children: [
+            
             Home(),
-
+             PremiPage(),
             Container(decoration: BoxDecoration(color: Colors.blue)),
 
-            Container(decoration: BoxDecoration(color: Colors.green)),
+           
 
             ProfilePage(),
           ],

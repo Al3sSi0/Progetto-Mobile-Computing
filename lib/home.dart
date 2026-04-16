@@ -5,8 +5,12 @@ import 'package:corner/pages/sole_page.dart';
 import 'package:corner/pages/fuoco_page.dart';
 import 'package:corner/pages/ilMilionario_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'dart:math';
 import 'dart:ui';
+
+
 
 class CardButtonData {
   final String title;
@@ -33,27 +37,107 @@ class _AnimatedButtonsCarouselState extends State<AnimatedButtonsCarousel> {
   final double _scaleFactor = 0.8;
 
   final List<CardButtonData> _items = [
+    CardButtonData('IL MILIONARIO', () => QuizScreen(),'assets/images/modric_corner.png',30,500,400),
     CardButtonData('Sole', () => SolePage(),'assets/images/messi_corner.png',10, 500, 500),
     CardButtonData('Fuoco', () => FuocoPage(),'assets/images/messi_corner.png',10, 500, 500),
-    CardButtonData('IL MILIONARIO', () => QuizScreen(),'assets/images/modric_corner.png',30,500,400),
+    
   ];
 
   @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted) {
-        setState(() {});
-      }
-    });
-    _pageController = PageController(
-      viewportFraction: _viewportFraction,
-      initialPage: _items.length * 100,
-    );
-    _pageController.addListener(() {
-      setState(() {});
-    });
+void initState() {
+  super.initState();
+_checkUserNickname();
+  // Inizializzazione del tuo PageController esistente
+  _pageController = PageController(
+    viewportFraction: _viewportFraction,
+    initialPage: _items.length * 100,
+    
+  );
+
+  _pageController.addListener(() {
+    setState(() {});
+  });
+
+  // Gestione post-frame: aggiorna la UI e controlla il Nickname
+  WidgetsBinding.instance.addPostFrameCallback((_) {
+    if (mounted) {
+      setState(() {}); // Il tuo vecchio setState
+    }
+  });
+}
+
+
+// Controlla su Firestore se l'utente ha già scelto un nome
+Future<void> _checkUserNickname() async {
+  final user = FirebaseAuth.instance.currentUser;
+  if (user != null && !user.isAnonymous) {
+    // Accede alla collezione 'users' che abbiamo creato insieme
+    var doc = await FirebaseFirestore.instance.collection('users').doc(user.uid).get();
+
+    // Se il documento non esiste o il campo nickname è nullo
+    if (!doc.exists || doc.data()?['nickname'] == null) {
+      _showNicknamePopUp(context, user.uid);
+    }
   }
+}
+
+// Mostra il pop-up carino per il Nickname
+void _showNicknamePopUp(BuildContext context, String uid) {
+  final TextEditingController _controller = TextEditingController();
+
+  showDialog(
+    context: context,
+    barrierDismissible: false, // Obblighiamo l'utente a scegliere un nome
+    builder: (context) => AlertDialog(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+      title: const Text("Benvenuto su Corner! ⚽", textAlign: TextAlign.center),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const Text("Sembra che tu non abbia ancora un nickname."),
+          const SizedBox(height: 20),
+          TextField(
+            controller: _controller,
+            decoration: InputDecoration(
+              labelText: "Inserisci Nickname",
+              prefixIcon: const Icon(Icons.person_outline),
+              border: OutlineInputBorder(borderRadius: BorderRadius.circular(15)),
+            ),
+          ),
+        ],
+      ),
+      actions: [
+        Center(
+          child: ElevatedButton(
+            onPressed: () async {
+              String nick = _controller.text.trim();
+              if (nick.isNotEmpty) {
+                // Salviamo il nome nel "cassetto" users su Firestore
+                await FirebaseFirestore.instance.collection('users').doc(uid).set({
+                  'nickname': nick,
+                  'lastUpdate': FieldValue.serverTimestamp(),
+                  'trophies':[],
+                }, SetOptions(merge: true));
+                
+                Navigator.pop(context); // Chiude il pop-up
+                
+                // Opzionale: un messaggio di successo
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text("Benvenuto, $nick!")),
+                );
+              }
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.green,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+            ),
+            child: const Text("Inizia a giocare", style: TextStyle(color: Colors.white)),
+          ),
+        ),
+      ],
+    ),
+  );
+}
 
   @override
   void dispose() {
@@ -98,7 +182,7 @@ class _AnimatedButtonsCarouselState extends State<AnimatedButtonsCarousel> {
     return Transform(
     transform: matrix,
     child: Card(
-      elevation: 10,
+      elevation: 15,
       margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 20),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
       clipBehavior: Clip.hardEdge,
@@ -113,14 +197,13 @@ class _AnimatedButtonsCarouselState extends State<AnimatedButtonsCarousel> {
   decoration: BoxDecoration(
     borderRadius: BorderRadius.circular(20),
     gradient: LinearGradient(
-      begin: Alignment.topCenter, // Punto di inizio (es. in alto a sinistra)
-      end: Alignment.bottomCenter, // Punto di fine (es. in basso a destra)
+      begin: Alignment.topCenter, 
+      end: Alignment.bottomCenter, 
       colors: [
-
-        colore_barra.withOpacity(0.5), // Stesso colore ma più trasparente
-         colore_barra, // Colore pieno
+        colore_barra.withOpacity(0.9), 
+         colore_barra.withOpacity(0.6), 
       ],
-      stops: const [0, 0.7], // 0.0 è l'inizio, 1.0 è la fine
+      stops: const [0, 1], 
     ),
   ),
           child: Stack(
@@ -143,7 +226,7 @@ class _AnimatedButtonsCarouselState extends State<AnimatedButtonsCarousel> {
                   },
                   blendMode: BlendMode.dstIn,
                   child: Opacity(
-                    opacity: 0.3, 
+                    opacity: 0.4, 
                     child: Image.asset(
                       data.imagePath,
                       width: data.widthImg,

@@ -160,7 +160,7 @@ class _QuizScreenState extends State<QuizScreen> {
                   color: colore_barra,
                   iconSize: 40,
                   onPressed: () {
-                    Navigator.push(
+                    Navigator.pop(
                       context,
                       MaterialPageRoute(builder: (_) => Home()),
                     );;                 

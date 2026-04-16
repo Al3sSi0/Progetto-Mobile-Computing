@@ -4,6 +4,8 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:corner/services/auth.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 
 class ProfilePage extends StatefulWidget {
@@ -16,21 +18,49 @@ class ProfilePage extends StatefulWidget {
 class _ProfilePageState extends State<ProfilePage> {
   bool _isUploading = false;
   bool _notificheAttive = true;
-  File? _imageFile; // Variabile per tenere l'immagine selezionata
+  File? _imageFile; 
   final ImagePicker _picker = ImagePicker();
-  String? _profileImageUrl; // URL dell'immagine attuale (se esiste)
+  String? _profileImageUrl; 
+  String? _currentNickname; 
 
-  // Funzione per selezionare l'immagine
+  @override
+void initState() {
+  super.initState();
+  _loadUserData(); 
+}
+
+Future<void> _loadUserData() async {  
+  final user = FirebaseAuth.instance.currentUser;
+  if (user == null || user.isAnonymous) {
+    setState(() {
+      _currentNickname = "Ospite";
+      _profileImageUrl = null; 
+    });
+    return; 
+  }
+
+
+  if (user != null) {
+    var doc = await FirebaseFirestore.instance.collection('users').doc(user.uid).get();
+    
+    if (doc.exists) {
+      setState(() {
+        _profileImageUrl = doc.data()?['profileImageUrl'];
+        _currentNickname = doc.data()?['nickname'];
+      });
+    }
+  }
+}
+
   Future<void> _pickImage() async {
     final XFile? pickedFile = await _picker.pickImage(
       source: ImageSource.gallery,
-      imageQuality: 80, // Comprime leggermente per velocizzare il caricamento
+      imageQuality: 80, 
     );
 
     if (pickedFile != null) {
       setState(() {
         _imageFile = File(pickedFile.path);
-        // Resettiamo l'URL di rete per dare priorità all'anteprima locale
         _profileImageUrl = null;
       });
     }
@@ -110,51 +140,59 @@ class _ProfilePageState extends State<ProfilePage> {
     });
   }
 
-  // 2. Funzione per CARICARE l'immagine su Firebase Storage
+  // --- NUOVA VERSIONE DELLA FUNZIONE ---
   Future<void> _uploadAndUpdateProfile() async {
-    if (_imageFile == null) return;
+  if (_imageFile == null) return;
 
-    // Inizia il caricamento visivo
+  setState(() => _isUploading = true);
+
+  try {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) return;
+    String userId = user.uid;
+
+    // 1. CARICAMENTO SU FIREBASE STORAGE (Il magazzino dei file)
+    Reference storageRef = FirebaseStorage.instance
+        .ref()
+        .child('user_profiles')
+        .child('$userId.jpg');
+
+    await storageRef.putFile(_imageFile!);
+    String downloadUrl = await storageRef.getDownloadURL();
+
+    // 2. AGGIORNAMENTO SU FIRESTORE (Il database testuale)
+    // Usiamo SetOptions(merge: true) per NON cancellare il nickname!
+    await FirebaseFirestore.instance.collection('users').doc(userId).set({
+      'profileImageUrl': downloadUrl,
+      'lastUpdate': FieldValue.serverTimestamp(),
+    }, SetOptions(merge: true));
+
     setState(() {
-      _isUploading = true;
+      _profileImageUrl = downloadUrl;
+      _imageFile = null;
+      _isUploading = false;
     });
 
-    try {
-      // DEFINISCI IL PERCORSO: Usa un ID utente statico o dinamico
-      // (es: FirebaseAuth.instance.currentUser!.uid)
-      // Qui usiamo un ID statico per test.
-      String userId = "id_utente_esempio";
-      Reference storageRef = FirebaseStorage.instance
-          .ref()
-          .child('user_profiles')
-          .child('$userId.jpg'); // Sovrascrive se il nome è uguale
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text("Profilo salvato con successo!")),
+    );
+  } catch (e) {
+    setState(() => _isUploading = false);
+    print("Errore durante l'upload: $e");
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text("Errore: $e"), backgroundColor: Colors.red),
+    );
+  }
+}
 
-      // Esegui il caricamento fisico
-      await storageRef.putFile(_imageFile!);
-
-      // Ottieni l'URL pubblico appena generato
-      String downloadUrl = await storageRef.getDownloadURL();
-
-      // Fine del caricamento e aggiornamento stato
-      setState(() {
-        _profileImageUrl = downloadUrl; // Mostra l'immagine di rete
-        _imageFile = null; // Rimuove il file locale
-        _isUploading = false; // Nasconde il caricamento
-      });
-
-      // Feedback all'utente
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Profilo aggiornato con successo!")),
-      );
-    } catch (e) {
-      // Gestione errori
-      setState(() {
-        _isUploading = false;
-      });
-      print("Errore durante il caricamento: $e");
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Errore: $e"), backgroundColor: Colors.red),
-      );
+  // Funzione per salvare SOLO il nickname (usata dal pop-up)
+  Future<void> _saveNickname(String nickname) async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      await FirebaseFirestore.instance.collection('users').doc(user.uid).set({
+        'nickname': nickname,
+        'lastUpdate': FieldValue.serverTimestamp(),
+      }, SetOptions(merge: true));
     }
   }
 
@@ -163,8 +201,8 @@ class _ProfilePageState extends State<ProfilePage> {
     return Scaffold(
       extendBodyBehindAppBar: true,
       appBar: AppBar(
-        title: const Text(
-          "Profilo Utente",
+        title: Text(
+          _currentNickname ?? "Profilo Utente",
           style: TextStyle(
             fontFamily: 'Instagram Sans',
             color: colore_barra,
@@ -420,8 +458,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       // Elenco dei nomi
                       _buildCreditName("Alessandro Di Saverio"),
                       _buildCreditName("Alessio Falasca"),
-                      _buildCreditName("Gemini AI"),
-
+                      
                       const SizedBox(height: 10),
                       const Text(
                         "Progetto Mobile Computing 2025/2026",
