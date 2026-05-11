@@ -1,3 +1,4 @@
+import 'package:corner/authenticate/login.dart';
 import 'package:corner/structure.dart';
 import 'package:corner/main.dart';
 import 'dart:io';
@@ -18,44 +19,46 @@ class ProfilePage extends StatefulWidget {
 class _ProfilePageState extends State<ProfilePage> {
   bool _isUploading = false;
   bool _notificheAttive = true;
-  File? _imageFile; 
+  File? _imageFile;
   final ImagePicker _picker = ImagePicker();
-  String? _profileImageUrl; 
-  String? _currentNickname; 
+  String? _profileImageUrl;
+  String? _currentNickname;
 
   @override
-void initState() {
-  super.initState();
-  _loadUserData(); 
-}
-
-Future<void> _loadUserData() async {  
-  final user = FirebaseAuth.instance.currentUser;
-  if (user == null || user.isAnonymous) {
-    setState(() {
-      _currentNickname = "Ospite";
-      _profileImageUrl = null; 
-    });
-    return; 
+  void initState() {
+    super.initState();
+    _loadUserData();
   }
 
-
-  if (user != null) {
-    var doc = await FirebaseFirestore.instance.collection('users').doc(user.uid).get();
-    
-    if (doc.exists) {
+  Future<void> _loadUserData() async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null || user.isAnonymous) {
       setState(() {
-        _profileImageUrl = doc.data()?['profileImageUrl'];
-        _currentNickname = doc.data()?['nickname'];
+        _currentNickname = "Ospite";
+        _profileImageUrl = null;
       });
+      return;
+    }
+
+    if (user != null) {
+      var doc = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(user.uid)
+          .get();
+
+      if (doc.exists) {
+        setState(() {
+          _profileImageUrl = doc.data()?['profileImageUrl'];
+          _currentNickname = doc.data()?['nickname'];
+        });
+      }
     }
   }
-}
 
   Future<void> _pickImage() async {
     final XFile? pickedFile = await _picker.pickImage(
       source: ImageSource.gallery,
-      imageQuality: 80, 
+      imageQuality: 80,
     );
 
     if (pickedFile != null) {
@@ -142,48 +145,48 @@ Future<void> _loadUserData() async {
 
   // --- NUOVA VERSIONE DELLA FUNZIONE ---
   Future<void> _uploadAndUpdateProfile() async {
-  if (_imageFile == null) return;
+    if (_imageFile == null) return;
 
-  setState(() => _isUploading = true);
+    setState(() => _isUploading = true);
 
-  try {
-    final user = FirebaseAuth.instance.currentUser;
-    if (user == null) return;
-    String userId = user.uid;
+    try {
+      final user = FirebaseAuth.instance.currentUser;
+      if (user == null) return;
+      String userId = user.uid;
 
-    // 1. CARICAMENTO SU FIREBASE STORAGE (Il magazzino dei file)
-    Reference storageRef = FirebaseStorage.instance
-        .ref()
-        .child('user_profiles')
-        .child('$userId.jpg');
+      // 1. CARICAMENTO SU FIREBASE STORAGE (Il magazzino dei file)
+      Reference storageRef = FirebaseStorage.instance
+          .ref()
+          .child('user_profiles')
+          .child('$userId.jpg');
 
-    await storageRef.putFile(_imageFile!);
-    String downloadUrl = await storageRef.getDownloadURL();
+      await storageRef.putFile(_imageFile!);
+      String downloadUrl = await storageRef.getDownloadURL();
 
-    // 2. AGGIORNAMENTO SU FIRESTORE (Il database testuale)
-    // Usiamo SetOptions(merge: true) per NON cancellare il nickname!
-    await FirebaseFirestore.instance.collection('users').doc(userId).set({
-      'profileImageUrl': downloadUrl,
-      'lastUpdate': FieldValue.serverTimestamp(),
-    }, SetOptions(merge: true));
+      // 2. AGGIORNAMENTO SU FIRESTORE (Il database testuale)
+      // Usiamo SetOptions(merge: true) per NON cancellare il nickname!
+      await FirebaseFirestore.instance.collection('users').doc(userId).set({
+        'profileImageUrl': downloadUrl,
+        'lastUpdate': FieldValue.serverTimestamp(),
+      }, SetOptions(merge: true));
 
-    setState(() {
-      _profileImageUrl = downloadUrl;
-      _imageFile = null;
-      _isUploading = false;
-    });
+      setState(() {
+        _profileImageUrl = downloadUrl;
+        _imageFile = null;
+        _isUploading = false;
+      });
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text("Profilo salvato con successo!")),
-    );
-  } catch (e) {
-    setState(() => _isUploading = false);
-    print("Errore durante l'upload: $e");
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text("Errore: $e"), backgroundColor: Colors.red),
-    );
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Profilo salvato con successo!")),
+      );
+    } catch (e) {
+      setState(() => _isUploading = false);
+      print("Errore durante l'upload: $e");
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Errore: $e"), backgroundColor: Colors.red),
+      );
+    }
   }
-}
 
   // Funzione per salvare SOLO il nickname (usata dal pop-up)
   Future<void> _saveNickname(String nickname) async {
@@ -393,10 +396,26 @@ Future<void> _loadUserData() async {
                   vertical: 20, // Un po' di spazio dal fondo del telefono
                 ),
                 child: ElevatedButton.icon(
-                  onPressed: () {
-                    // 1. FERMA LA MUSICA USANDO LA TUA FUNZIONE GLOBALE
+                  onPressed: () async {
+                    // Aggiungi async qui!
+                    // 1. Ferma la musica
                     toggleMusic(false);
-                    signOut();
+
+                    // 2. Esegui il logout attendendo che finisca
+                    await signOut();
+
+                    // 3. Verifica se il widget è ancora "vivo" prima di usare context
+                    if (!context.mounted) return;
+
+                    // 4. Naviga verso la pagina di Login (sostituisci LoginPage() con il nome della tua pagina)
+                    // Usiamo pushAndRemoveUntil per cancellare la cronologia delle pagine
+                    // in modo che l'utente non possa tornare indietro premendo la freccia indietro.
+                    Navigator.of(context).pushAndRemoveUntil(
+                      MaterialPageRoute(
+                        builder: (context) => const LoginPage(),
+                      ), // METTI LA TUA CLASSE LOGIN QUI
+                      (Route<dynamic> route) => false,
+                    );
                   },
                   icon: const Icon(Icons.logout, size: 28),
                   label: const Text(
@@ -458,7 +477,7 @@ Future<void> _loadUserData() async {
                       // Elenco dei nomi
                       _buildCreditName("Alessandro Di Saverio"),
                       _buildCreditName("Alessio Falasca"),
-                      
+
                       const SizedBox(height: 10),
                       const Text(
                         "Progetto Mobile Computing 2025/2026",

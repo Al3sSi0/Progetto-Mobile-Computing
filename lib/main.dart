@@ -30,7 +30,7 @@ Future<void> startBackgroundMusic() async {
   bgMusicPlayer.setReleaseMode(ReleaseMode.loop);
 
   // Avvia la riproduzione del file che hai messo negli assets
-  await bgMusicPlayer.play(AssetSource('audio/background.mp3'));
+  await bgMusicPlayer.play(AssetSource('audio/innoChampions.mp3'));
   isMusicPlayingNotifier.value = true;
 }
 
@@ -57,7 +57,7 @@ class _MyAppState extends State<MyApp> {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       home: StreamBuilder(
-        stream: AuthService().authStateChanges, 
+        stream: AuthService().authStateChanges,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Scaffold(
@@ -65,11 +65,13 @@ class _MyAppState extends State<MyApp> {
             );
           }
 
-          if (snapshot.hasData && snapshot.data != null  && snapshot.data!.emailVerified) {
+          if (snapshot.hasData &&
+              snapshot.data != null &&
+              snapshot.data!.emailVerified) {
             return Structure();
           }
           return Authentication();
-        }
+        },
       ),
     );
   }
