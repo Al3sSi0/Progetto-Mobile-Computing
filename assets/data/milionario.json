@@ -1,0 +1,104 @@
+{
+    "questions": [
+        {
+            "text": "Chi ha vinto il Pallone d'Oro nel 2007?",
+            "options": [
+                "Kakà",
+                "Messi",
+                "Cristiano Ronaldo",
+                "Ronaldinho"
+            ],
+            "correctIndex": 0
+        },
+        {
+            "text": "Quale squadra ha vinto più Champions League?",
+            "options": [
+                "Milan",
+                "Bayern Monaco",
+                "Real Madrid",
+                "Liverpool"
+            ],
+            "correctIndex": 2
+        },
+        {
+            "text": "In che anno l'Italia ha vinto il suo quarto Mondiale?",
+            "options": [
+                "1982",
+                "1994",
+                "2006",
+                "2010"
+            ],
+            "correctIndex": 2
+        },
+        {
+            "text": "Quale tra queste squadre NON ha mai fatto il Triplete?",
+            "options": [
+                "Inter",
+                "Barcellona",
+                "Juventus",
+                "Bayern Monaco"
+            ],
+            "correctIndex": 2
+        },
+        {
+            "text": "Chi è il miglior marcatore della storia della Serie A?",
+            "options": [
+                "Francesco Totti",
+                "Silvio Piola",
+                "Gunnar Nordahl",
+                "Roberto Baggio"
+            ],
+            "correctIndex": 1
+        },
+        {
+            "text": "Chi ha segnato il famoso gol con la 'Mano de Dios'?",
+            "options": [
+                "Pelé",
+                "Diego Maradona",
+                "Lionel Messi",
+                "Zico"
+            ],
+            "correctIndex": 1
+        },
+        {
+            "text": "Quante squadre partecipano attualmente alla fase a gironi della Champions League?",
+            "options": [
+                "24",
+                "32",
+                "36",
+                "40"
+            ],
+            "correctIndex": 2
+        },
+        {
+            "text": "Quale nazione ha vinto il primo Mondiale di calcio nel 1930?",
+            "options": [
+                "Brasile",
+                "Italia",
+                "Argentina",
+                "Uruguay"
+            ],
+            "correctIndex": 3
+        },
+        {
+            "text": "In quale squadra italiana ha giocato Zlatan Ibrahimovic PRIMA di andare al Barcellona?",
+            "options": [
+                "Milan",
+                "Inter",
+                "Juventus",
+                "Roma"
+            ],
+            "correctIndex": 1
+        },
+        {
+            "text": "Quale giocatore detiene il record per il maggior numero di gol in una singola edizione della Champions League (17 gol)?",
+            "options": [
+                "Lionel Messi",
+                "Robert Lewandowski",
+                "Cristiano Ronaldo",
+                "Karim Benzema"
+            ],
+            "correctIndex": 2
+        }
+    ]
+}

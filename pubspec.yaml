@@ -23,6 +23,7 @@ dependencies:
   image_picker: ^1.2.1       # Per accedere a galleria/camera
   cloud_firestore: ^6.1.2    # Per salvare l'URL nel profilo utente
   cached_network_image: ^3.3.0 # Ottimo per mostrare immagini dal web con cache
+  google_fonts: ^7.0.0
   #flutter_local_notifications: ^20.1.0
 
 dev_dependencies:

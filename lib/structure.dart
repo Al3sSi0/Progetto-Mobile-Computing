@@ -1,5 +1,5 @@
 import 'package:corner/home.dart';
-import 'package:corner/achivments.dart';
+import 'package:corner/achievements.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
@@ -61,16 +61,7 @@ class _StructureState extends State<Structure> {
         body: PageView(
           controller: _pageController,
           onPageChanged: _onPageChanged,
-          children: [
-            
-            Home(),
-             PremiPage(),
-            Container(decoration: BoxDecoration(color: Colors.blue)),
-
-           
-
-            ProfilePage(),
-          ],
+          children: [Home(), PremiPage(), ProfilePage()],
         ),
 
         bottomNavigationBar: CurvedNavigationBar(
@@ -81,7 +72,6 @@ class _StructureState extends State<Structure> {
           height: 60,
           items: <Widget>[
             Icon(CupertinoIcons.home, size: 30, color: Colors.white),
-            Icon(CupertinoIcons.shopping_cart, size: 30, color: Colors.white),
             Icon(CupertinoIcons.star, size: 30, color: Colors.white),
             Icon(CupertinoIcons.person, size: 30, color: Colors.white),
           ],
